@@ -1,0 +1,8 @@
+django
+psycopg2
+django-decouple
+django-import-export
+pillow
+gunicorn
+django-ckeditor
+django_cleanup
