@@ -9,6 +9,8 @@ from django.utils.html import strip_tags
 #from django.apps import apps
 
 # Create your models here.
+
+
 class AspirantProfile(models.Model):
     
     user = models.OneToOneField(User,on_delete=models.CASCADE),

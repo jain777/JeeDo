@@ -1,5 +1,6 @@
 from django.contrib.auth import login,logout
 from django.shortcuts import reverse,redirect
+from team.serializers import AspirantProfileSerializer,ExpertProfileSerializer
 #from django.views.generic import CreateView
 #from .forms import AspirantRegistrationForm,ExpertRegistraionForm
 from accounts.models import AspirantProfile, ExpertProfile
