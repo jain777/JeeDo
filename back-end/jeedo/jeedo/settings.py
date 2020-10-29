@@ -10,22 +10,27 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
+import logging
+import os
+from decouple import config
+
+logger= logging.getLogger()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=i0a&1v7(*(m-lq+&es^y7nwda3@$^i9s2t!bk9ipwkf+2lzvm'
+SECRET_KEY = config('SECRET_KEY',default='=i0a&1v7(*(m-lq+&es^y7nwda3@$^i9s2t!bk9ipwkf+2lzvm',cast =str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG',default =True,cast =bool)
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = config('ALLOWED_HOSTS',cast =lambda v:[s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -37,6 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_cleanup',
+    'ckeditor_uploader',
+    'import_export',
+    'accounts',
+    'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +65,7 @@ ROOT_URLCONF = 'jeedo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,13 +83,17 @@ WSGI_APPLICATION = 'jeedo.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR,'db.sqlite3')
+        }
     }
-}
+else:
+    DATABASES={}
+
+
 
 
 # Password validation
@@ -105,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -116,5 +131,40 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+ADMINS = [tuple(s for s in v.split(":")) for v in config('ADMIN_EMAILS').split("|")]
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = '/static/'
+SERVER_EMAIL = config('EMAIL_ID')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '465'
+EMAIL_HOST_USER = config('EMAIL_ID')  # For Forgot Password Email
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
+EMAIL_USE_SSL = True
+JEEDO_EMAIL = config('JEEDO_EMAIL_ID')  # For Sending other Details
+JEEDO_EMAIL_PASSWORD = config('JEEDO_EMAIL_PASSWORD')
+RECIPIENT_EMAILS = config('RECIPIENT_EMAIL').split(',')  # For getting the details of the company that registered
+SEND_EMAIL_ASPIRANT = config('SEND_EMAIL_STUDENT', default=True, cast=bool)
+SEND_EMAIL_EXPERT = config('SEND_EMAIL_COMPANY', default=True, cast=bool)
+#SEND_EMAIL_COMPANY_DETAILS = config('SEND_EMAIL_COMPANY_DETAILS', default=True, cast=bool)
+
+STATIC_URL = '/static_django/'
+
+STATICFILES_DIRS=[
+    os.path.join(BASE_DIR, config('MEDIA_PATH',default = 'assests/media/staticfiles',cast = str)),
+
+]
+MEDIA_ROOT = os.path.join(BASE_DIR,config('MEDIA_PATH',default = 'assets/media',cast =str))
+MEDIA_URL = '/media_django/'
+
+REST_FRAMEWORK ={
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'accounts.authentication.SessionAuthentication',
+    )
+}
+
+if not DEBUG:
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES']=(
+        'rest_framework.renderers.JSONRenderer'
+    )
