@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'import_export',
     'accounts',
+    'team',
     'rest_framework',
     'django_filters',
 ]
