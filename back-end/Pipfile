@@ -8,6 +8,14 @@ verify_ssl = true
 [packages]
 django = "*"
 pillow = "*"
+django-decouple = "*"
+psycopg2 = "*"
+django-cleanup = "*"
+django-ckeditor = "*"
+django-import-export = "*"
+djangorestframework = "*"
+requests = "*"
+django-filter = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
