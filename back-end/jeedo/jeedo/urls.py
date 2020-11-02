@@ -14,8 +14,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
+from accounts.views import AspirantProfile,ExpertProfile
+from django.contrib.auth.views import LogoutView
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+
+admin.site.site_title = 'JEEDO Administration'
+admin.site.site_header = 'JEEDO Administration'
+admin.site.index_title = 'Admin Panel'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/auth/',include('accounts.urls')),
+    path('members/',include('team.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns=urlpatterns+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
